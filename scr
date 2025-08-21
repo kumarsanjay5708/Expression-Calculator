@@ -1,0 +1,69 @@
+# Expression Calculator using Infix to Postfix Conversion and Evaluation
+
+# Function to define precedence of operators
+def precedence(op):
+    if op in ('+', '-'):
+        return 1
+    if op in ('*', '/', '%'):
+        return 2
+    return 0
+
+# Convert Infix expression to Postfix
+def infix_to_postfix(expression):
+    stack = []  # for operators
+    result = [] # for output (postfix)
+    
+    for char in expression:
+        # If operand, add to result
+        if char.isdigit():
+            result.append(char)
+        # If '(', push to stack
+        elif char == '(':
+            stack.append(char)
+        # If ')', pop until '('
+        elif char == ')':
+            while stack and stack[-1] != '(':
+                result.append(stack.pop())
+            stack.pop()  # remove '('
+        # Operator case
+        else:
+            while stack and precedence(stack[-1]) >= precedence(char):
+                result.append(stack.pop())
+            stack.append(char)
+    
+    # Pop remaining operators
+    while stack:
+        result.append(stack.pop())
+    
+    return "".join(result)
+
+# Evaluate Postfix expression
+def evaluate_postfix(expression):
+    stack = []
+    for char in expression:
+        # If operand, push to stack
+        if char.isdigit():
+            stack.append(int(char))
+        else:
+            # Pop two values for operation
+            b = stack.pop()
+            a = stack.pop()
+            if char == '+':
+                stack.append(a + b)
+            elif char == '-':
+                stack.append(a - b)
+            elif char == '*':
+                stack.append(a * b)
+            elif char == '/':
+                stack.append(a // b)  # integer division
+            elif char == '%':
+                stack.append(a % b)
+    return stack[0]
+
+# Main Program
+if __name__ == "__main__":
+    expression = input("Enter a mathematical expression (e.g. 3+(4*2)): ")
+    postfix = infix_to_postfix(expression)
+    print("Postfix Expression:", postfix)
+    result = evaluate_postfix(postfix)
+    print("Final Result:", result)
